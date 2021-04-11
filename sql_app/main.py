@@ -13,14 +13,8 @@ import datetime, random, uuid
 
 # enable CORS
 origins = [
-    # "http://localhost",
-    # "http://localhost:5500",
-    # "http://127.0.0.1:5500",
-    # "https://udn.com/*"
     "*"
 ]
-
-
 
 #connnect to database
 DATABASE_URL = 'postgresql://kjyang:netdb2602@localhost:5432/news_postgres'
@@ -58,8 +52,8 @@ class UserListGetid(BaseModel):
 
 
 class UserEntry(BaseModel):
-    user_id          : str  
-    news_url         : str  
+    user_id          : str
+    news_url         : str
     news_result      : bool
 
 
@@ -76,7 +70,7 @@ class UserDelete(BaseModel):
 
 
 # fastapi
-app = FastAPI() 
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
