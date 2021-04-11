@@ -11,6 +11,8 @@ sqlalchemy = "*"
 psycopg2 = "*"
 databases = "*"
 asyncpg = "*"
+pre-commit = "*"
+commitizen = "*"
 
 [dev-packages]
 
