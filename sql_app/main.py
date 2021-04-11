@@ -1,73 +1,19 @@
-# body
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import databases, sqlalchemy
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String ,DateTime ,Boolean
-from pydantic import BaseModel, Field
 from typing import List, Optional
-
-
-# other
 import datetime, random, uuid
 
+# body
+import pg_db
+import model
+database = pg_db.database
+users = pg_db.users
 
 # enable CORS
 origins = [
     "*"
 ]
-
-#connnect to database
-DATABASE_URL = 'postgresql://kjyang:netdb2602@localhost:5432/news_postgres'
-database = databases.Database(DATABASE_URL)
-metadata = sqlalchemy.MetaData()
-
-
-#define table
-users = sqlalchemy.Table(
-    'result',
-    metadata,
-    sqlalchemy.Column('user_id' ,String , primary_key = True ),
-    sqlalchemy.Column('news_url',String ,  primary_key = True ),
-    sqlalchemy.Column('create_at',DateTime ,default=datetime.datetime.utcnow ),
-    sqlalchemy.Column('news_result',Boolean ),
-    sqlalchemy.Column('block_chain_url',String  ),
-)
-
-engine = create_engine(
-    DATABASE_URL
-)
-metadata.create_all(engine)
-
-# Model
-class UserList(BaseModel):
-    user_id          : str
-    news_url         : str
-    create_at        : Optional[datetime.datetime] = None
-    news_result      : bool
-    # block_chain_url  : str  # recover this when block chain is complete
-
-class UserListGetid(BaseModel):
-    user_id          : str
-    news_url         : str
-
-
-class UserEntry(BaseModel):
-    user_id          : str
-    news_url         : str
-    news_result      : bool
-
-
-class UserUpdate(BaseModel):
-    user_id          : str = Field(..., example = 'enter your id')
-    news_url         : str  = Field(..., example = 'enter your url')
-    create_at        : Optional[datetime.datetime] = None
-    news_result      : bool = Field(..., example = False)
-    block_chain_url  : str  = Field(..., example = '321321314')
-
-class UserDelete(BaseModel):
-    user_id          : str = Field(..., example = 'enter your id')
-    news_url         : str = Field(..., example = 'enter your url')
-
 
 # fastapi
 app = FastAPI()
@@ -80,7 +26,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 @app.on_event('startup')
 async def startup():
     await database.connect()
@@ -89,13 +34,13 @@ async def startup():
 async def shutdown():
     await database.disconnect()
 
-@app.get('/users', response_model = List[UserList])
+@app.get('/users', response_model = List[model.UserList])
 async def find_all_user():
     query = users.select()
     return await database.fetch_all(query)
 
-@app.post('/users/{user_id}/{news_url}/{news_result}', response_model = UserEntry)
-async def register_user(user : UserEntry):
+@app.post('/users/{user_id}/{news_url}/{news_result}', response_model = model.UserEntry)
+async def register_user(user : model.UserEntry):
     gDate = datetime.datetime.now()
     query = users.insert().values(
         user_id = user.user_id,
@@ -111,13 +56,13 @@ async def register_user(user : UserEntry):
         'news_result'      : user.news_result,
      }
 
-@app.get('/users/{user_id}/{news_url}', response_model = UserListGetid)
+@app.get('/users/{user_id}/{news_url}', response_model = model.UserListGetid)
 async def find_user_by_id(user_id : str, news_url : str):
     query = users.select().where(users.c.user_id == user_id ).where( users.c.news_url == news_url )
     return await database.fetch_one(query)
 
-@app.put('/users', response_model = UserList)
-async def update_user(user : UserUpdate):
+@app.put('/users', response_model = model.UserList)
+async def update_user(user : model.UserUpdate):
     gDate = datetime.datetime.now()
     query = users.update().\
         where(users.c.user_id == user.user_id and users.c.news_url == user.news_url).\
@@ -131,7 +76,7 @@ async def update_user(user : UserUpdate):
     return await find_user_by_id(user_id= user.user_id,news_url =  user.news_url)
 
 @app.delete('/users/{user_id}/{news_url}')
-async def delete_user(user: UserDelete):
+async def delete_user(user: model.UserDelete):
     query = users.delete().where(users.c.user_id == user.user_id ).where( users.c.news_url == user.news_url )
     await database.execute(query)
 
