@@ -1,0 +1,14 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:11-alpine
+    container_name: postgres
+    restart: always
+    expose:
+      - 5432
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: news_postgres
+      POSTGRES_USER: kjyang
+      POSTGRES_PASSWORD: netdb22602
