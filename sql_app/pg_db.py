@@ -3,7 +3,7 @@ import datetime, random, uuid
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String ,DateTime ,Boolean
 
 #connect to database
-DATABASE_URL = 'postgresql://kjyang:netdb2602@localhost:5432/news_postgres'
+DATABASE_URL = 'postgresql://netdb:netdb2602@db:5432/news_postgres'
 database = databases.Database(DATABASE_URL)
 metadata = sqlalchemy.MetaData()
 
