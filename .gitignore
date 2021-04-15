@@ -1,2 +1,5 @@
+# Evniornment files
 .env
+
+# Byte-comiled files
 __pycached__
