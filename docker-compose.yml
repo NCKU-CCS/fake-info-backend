@@ -5,10 +5,8 @@ services:
     image: postgres:11
     ports:
       - "5432:5432"
-    environment:
-      POSTGRES_DB: news_postgres
-      POSTGRES_USER: netdb
-      POSTGRES_PASSWORD: netdb2602
+    env_file:
+      - .env
     restart: always
   web:
     build:
