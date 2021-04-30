@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response, status
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String ,DateTime ,Boolean
 from typing import List, Optional
@@ -34,27 +35,30 @@ async def startup():
 async def shutdown():
     await database.disconnect()
 
-@app.get('/users', response_model = List[model.UserList])
+@app.get('/users', response_model = List[model.UserList], status_code = 202)
 async def find_all_user():
     query = users.select()
     return await database.fetch_all(query)
 
-@app.post('/users/{user_id}/{news_url}/{news_result}', response_model = model.UserEntry)
+@app.post('/users/{user_id}/{news_url}/{news_result}', status_code = 201)
 async def register_user(user : model.UserEntry):
     gDate = datetime.datetime.now()
-    query = users.insert().values(
-        user_id = user.user_id,
-        news_url = user.news_url,
-        create_at = gDate,
-        news_result = user.news_result
-    )
+    try :
+        query = users.insert().values(
+            user_id = user.user_id,
+            news_url = user.news_url,
+            create_at = gDate,
+            news_result = user.news_result
+        )
+        await database.execute(query)
+        return {
+            'user_id'          : user.user_id,
+            'news_url'         : user.news_url,
+            'news_result'      : user.news_result,
+        }
+    except :
+        return JSONResponse(status_code=409, content={"message": "Item already exists."})
 
-    await database.execute(query)
-    return {
-        'user_id'          : user.user_id,
-        'news_url'         : user.news_url,
-        'news_result'      : user.news_result,
-     }
 
 @app.get('/users/{user_id}/{news_url}', response_model = model.UserListGetid)
 async def find_user_by_id(user_id : str, news_url : str):
@@ -73,7 +77,7 @@ async def update_user(user : model.UserUpdate):
         )
     await database.execute(query)
 
-    return await find_user_by_id(user_id= user.user_id,news_url =  user.news_url)
+    return await find_user_by_id(user_id= user.user_id, news_url =  user.news_url)
 
 @app.delete('/users/{user_id}/{news_url}')
 async def delete_user(user: model.UserDelete):
