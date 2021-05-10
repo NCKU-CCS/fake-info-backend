@@ -40,7 +40,7 @@ async def find_all_user():
     query = users.select()
     return await database.fetch_all(query)
 
-@app.post('/users/{user_id}/{news_url}/{news_result}', status_code = 201)
+@app.post('/users/{user_id}/{news_url}/{news_result}/{comment}')
 async def register_user(user : model.UserEntry):
     gDate = datetime.datetime.now()
     try :
@@ -48,7 +48,8 @@ async def register_user(user : model.UserEntry):
             user_id = user.user_id,
             news_url = user.news_url,
             create_at = gDate,
-            news_result = user.news_result
+            news_result = user.news_result,
+            comment = user.comment
         )
         await database.execute(query)
         return {

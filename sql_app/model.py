@@ -9,7 +9,6 @@ class UserList(BaseModel):
     news_url         : str
     create_at        : Optional[datetime.datetime] = None
     news_result      : bool
-    # block_chain_url  : str  # recover this when block chain is complete
 
 class UserListGetid(BaseModel):
     user_id          : str
@@ -20,6 +19,7 @@ class UserEntry(BaseModel):
     user_id          : str
     news_url         : str
     news_result      : bool
+    comment          : str
 
 
 class UserUpdate(BaseModel):
