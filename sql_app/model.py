@@ -19,7 +19,7 @@ class UserEntry(BaseModel):
     user_id          : str
     news_url         : str
     news_result      : bool
-    comment          : str
+    comment          : str = None
 
 
 class UserUpdate(BaseModel):
