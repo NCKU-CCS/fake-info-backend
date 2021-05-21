@@ -26,9 +26,10 @@ users = sqlalchemy.Table(
     metadata,
     sqlalchemy.Column('user_id' , String, primary_key = True),
     sqlalchemy.Column('news_url', String, primary_key = True),
+    sqlalchemy.Column('comment', String),
     sqlalchemy.Column('create_at', DateTime, default = datetime.datetime.utcnow),
     sqlalchemy.Column('news_result', Boolean),
-    sqlalchemy.Column('block_chain_url', String),
+    sqlalchemy.Column('block_chain_url', String)
 )
 
 engine = create_engine(
