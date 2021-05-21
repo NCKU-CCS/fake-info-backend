@@ -16,5 +16,3 @@ cp sample.env .env
 ```
 docker-compose up -d --build
 ```
-
-export PATH="$PATH:/Users/kaijunyang/Library/Python/3.9/lib/python/site-packages"
